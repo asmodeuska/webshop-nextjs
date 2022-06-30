@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { logInWithEmailAndPassword, loginInWithGoogle, auth} from "../components/Firebase";
+import { logInWithEmailAndPassword, loginInWithGoogle, auth } from "../components/Firebase";
 import Container from '@mui/material/Container';
 import IconButton from '@mui/material/IconButton';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
@@ -10,6 +10,7 @@ import { Backdrop, CircularProgress, FormControl, InputLabel, OutlinedInput, Inp
 
 import { useAuthState } from "react-firebase-hooks/auth";
 import Link from 'next/link'
+import MaterialLink from '@mui/material/Link';
 import { useRouter } from 'next/router'
 
 
@@ -67,14 +68,17 @@ function Admin() {
             >
                 <CircularProgress color="inherit" />
             </Backdrop>
-            <Link href="./">
-                <Typography
-                    variant="h6"
-                    display="flex"
-                    component="div"
-                >
-                    Eshop
-                </Typography>
+
+            <Link href="/" passHref>
+                <MaterialLink color="netural" underline="hover">
+                    <Typography
+                        variant="h6"
+                        display="flex"
+                        component="div"
+                    >
+                        Eshop
+                    </Typography>
+                </MaterialLink>
             </Link>
             {!loadingNotOpen && showPage && <Container maxWidth="sm">
                 <Box
@@ -135,7 +139,12 @@ function Admin() {
                         Sign Up
                     </Button>
                     <Typography variant="caption" sx={{ my: 2 }}>
-                        Don&apos;t have an account? <Link href="./register">Register here.</Link>
+                        Don&apos;t have an account?
+                        <Link href="/register" passHref>
+                            <MaterialLink color="netural" underline="hover">
+                                <Typography variant='h6' >Register here.</Typography>
+                            </MaterialLink>
+                        </Link>
                     </Typography>
                 </Box >
             </Container>

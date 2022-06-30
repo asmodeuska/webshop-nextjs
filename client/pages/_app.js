@@ -50,7 +50,7 @@ export default function MyApp(props) {
         <ThemeProvider theme={theme}>
           <Component {...pageProps} />
         </ThemeProvider>
-        / </SnackbarProvider>
+      </SnackbarProvider>
     </React.Fragment>
   );
 }

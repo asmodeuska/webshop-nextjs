@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { logInWithEmailAndPassword, loginInWithGoogle, auth} from "../components/Firebase";
+import { logInWithEmailAndPassword, loginInWithGoogle, auth } from "../components/Firebase";
 import Container from '@mui/material/Container';
 import IconButton from '@mui/material/IconButton';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
@@ -10,6 +10,8 @@ import { useRouter } from 'next/router';
 
 import { useAuthState } from "react-firebase-hooks/auth";
 import Link from 'next/link'
+import MaterialLink from '@mui/material/Link';
+
 
 
 
@@ -37,7 +39,7 @@ function Login() {
   }, [user, loading]);
 
   return (
-    <div style = {{height:"100vh"}}>
+    <div style={{ height: "100vh" }}>
       <Backdrop
         sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
         open={loadingNotOpen}
@@ -111,7 +113,12 @@ function Login() {
             Sign Up
           </Button>
           <Typography variant="caption" sx={{ my: 2 }}>
-            Don&apos;t have an account? <Link href="/register">Register here.</Link>
+            Don&apos;t have an account? 
+            <Link href="/register" passHref>
+              <MaterialLink color="primary" underline="hover">
+                <Typography variant='caption' > Register here.</Typography>
+              </MaterialLink>
+            </Link>
           </Typography>
         </Box >
       </Container>

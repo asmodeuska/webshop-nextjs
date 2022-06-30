@@ -9,6 +9,8 @@ import { useSnackbar } from "notistack";
 import { Backdrop, CircularProgress, FormControl, InputLabel, OutlinedInput, InputAdornment, Box, Typography, Button } from "@mui/material";
 import { useRouter } from 'next/router';
 import Link from 'next/link'
+import MaterialLink from '@mui/material/Link';
+
 
 function Register() {
   const [email, setEmail] = useState("");
@@ -174,7 +176,12 @@ function Register() {
             </Box>
           </form>
           <Typography variant="caption" sx={{ my: 2 }}>
-            Do you have an account? <Link href="/login">Login here.</Link>
+            Do you have an account? 
+            <Link href="/login" passHref>
+              <MaterialLink color="primary" underline="hover">
+                <Typography variant='caption' > Login here.</Typography>
+              </MaterialLink>
+            </Link>
           </Typography>
         </Box >
       </Container >}
