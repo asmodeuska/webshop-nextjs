@@ -1,12 +1,14 @@
 import React from 'react';
 import Header from '../components/Header';
-import Frame from '../components/Frame';
+import Frame from '../components/FrameHome';
+import Footer from '../components/Footer';
 
 function Index() {
   return (
     <div className="App">
-      <Header/>
+      <Header searchBar={true} />
       <Frame/>
+      <Footer/>
     </div>
   );
 }

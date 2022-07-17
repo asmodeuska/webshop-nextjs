@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { TextField, Button, AppBar, Box, Toolbar, IconButton, Typography, InputBase, Badge, Grid, Tooltip, FormControl } from '@mui/material';
+import { TextField, Button, AppBar, Box, Toolbar, IconButton, Typography, Paper, Badge, Grid, Tooltip, FormControl, InputAdornment } from '@mui/material';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import ShoppingBasketIcon from '@mui/icons-material/ShoppingBasket';
 import LogoutIcon from '@mui/icons-material/Logout';
@@ -12,11 +12,11 @@ import Skeleton from '@mui/material/Skeleton';
 import { useRouter } from 'next/router';
 import Link from 'next/link'
 
-export default function Header() {
+export default function Header(props) {
 
-    const [isUserLoggedIn, setUserLoggedIn] = useState(false);
     const [search, setSearch] = useState("");
     const [user, loading] = useAuthState(auth);
+    const [cartSize, setCartSize] = useState(0);
     const menuId = 'primary-search-account-menu';
     const router = useRouter();
 
@@ -28,42 +28,65 @@ export default function Header() {
         })
     }
 
+    
+    useEffect(() => {
+        const cartItems = JSON.parse(localStorage.getItem('cart'));
+        let temp = 0;
+        if (cartItems) {
+            cartItems.map(item => {
+                temp+= item.quantity;
+            })
+        }
+        setCartSize(temp);
+    }, []);
+
+
     return (
-        <AppBar color='primary' position="sticky">
+        <AppBar color='grey' position="sticky">
             <Toolbar color='primary' >
                 <Grid container>
-                    <Grid item xs={6} display='inline-flex' alignItems="center" flexWrap="nowrap">
-                        <Link href="/" passHref>
-                            <MaterialLink color="netural" underline="hover">
-                                <Typography
-                                    variant="h6"
-                                    display="flex"
-                                    component="div"
-                                >
-                                    Eshop
-                                </Typography>
-                            </MaterialLink>
-                        </Link>
-                        <form className='formFullWidth' onSubmit={handleSearch}>
-                            <Box sx={{ width: 1 }} boxSizing="border-box" display="inline-flex" alignItems="center" justifyContent='flex-end'>
-                                <FormControl>
-                                    <Box m={1}>
-                                        <TextField InputLabelProps={{ required: false }} required id="searchMain" color="secondary" label="Search" variant="filled" onChange={(e) => setSearch(e.target.value)} />
-                                    </Box>
-                                </FormControl>
-                                <FormControl >
-                                    <Box>
-                                        <Button type="submit" color="secondary" variant="contained" startIcon={<SearchIcon />} >Search</Button>
-                                    </Box>
 
-                                </FormControl>
+                    <Grid item xs={5} display='flex' alignItems="center" flexWrap="nowrap">
+
+                        <form className='formFullWidth' onSubmit={handleSearch} style={{ width: "100%" }} >
+                            <Box sx={{ width: 1 }} boxSizing="border-box" display="flex" alignItems="center" justifyContent='flex-start' fullWidth>
+                                <Box mr={2}>
+                                    <Link href="/" passHref>
+                                        <MaterialLink color="netural" underline="hover">
+                                            <Typography
+                                                variant="h6"
+                                                display="flex"
+                                                component="div"
+                                                color="primary"
+                                            >
+                                                Eshop
+                                            </Typography>
+                                        </MaterialLink>
+                                    </Link>
+                                </Box>
+                                {props.searchBar &&
+                                    <FormControl fullWidth>
+                                        <TextField fullWidth InputLabelProps={{ required: false }} required id="searchMain" color="primary" label="Search" variant="filled" InputProps={{
+                                            endAdornment: (
+                                                <InputAdornment position="end">
+                                                    <IconButton type="submit">
+                                                        <SearchIcon color='primary' />
+                                                    </IconButton>
+                                                </InputAdornment>
+                                            ),
+                                            style: { color: 'white' }
+                                        }}
+                                            onChange={(e) => setSearch(e.target.value)} />
+                                    </FormControl>
+                                }
                             </Box>
 
                         </form>
+
                     </Grid>
-                    <Grid item xs={6} alignItems="center">
+                    <Grid display="flex" item xs={7} alignItems="center">
                         {loading ?
-                            <Box sx={{ width: 1 }} flexWrap="nowrap" boxSizing="border-box" alignItems="center" justifyContent='flex-end'>
+                            <Box sx={{ width: 1 }} flexWrap="nowrap" boxSizing="border-box" alignItems="end" justifyContent='flex-end'>
                                 <Skeleton variant="text" />
                             </Box>
 
@@ -72,7 +95,7 @@ export default function Header() {
                                 {user ?
                                     <div display="inline-flex">
                                         <Box display="inline-flex" justifyContent="center" direction="column" alignItems="center">
-                                            <Typography variant='h6' color="neutral">
+                                            <Typography variant='h6' color="primary">
                                                 Welcome {user.displayName}
                                             </Typography>
                                         </Box>
@@ -94,14 +117,14 @@ export default function Header() {
                                     <Grid item>
                                         <Box display="inline-flex" justifyContent="center" direction="column" alignItems="flex-end">
                                             <Link href="/login" passHref>
-                                                <MaterialLink color="secondary" underline="hover">
+                                                <MaterialLink color="primary" underline="hover">
                                                     <Typography variant='h6' >Login</Typography>
                                                 </MaterialLink>
                                             </Link>
 
                                             <Typography variant='h6'>&nbsp;or&nbsp;</Typography>
                                             <Link href="/register" passHref>
-                                                <MaterialLink color="secondary" underline="hover">
+                                                <MaterialLink color="primary" underline="hover">
                                                     <Typography variant='h6'>Register</Typography>
                                                 </MaterialLink>
                                             </Link>
@@ -116,7 +139,7 @@ export default function Header() {
                                 </IconButton>
 
                                 <IconButton size="large" color="inherit" edge="end">
-                                    <Badge badgeContent={0} color="error">
+                                    <Badge badgeContent={ props.cart || cartSize } color="error">
                                         <ShoppingBasketIcon />
                                     </Badge>
                                 </IconButton>
@@ -130,6 +153,5 @@ export default function Header() {
                 </Grid>
             </Toolbar>
         </AppBar >
-
     );
 }

@@ -7,16 +7,16 @@ import Visibility from '@mui/icons-material/Visibility';
 import GoogleIcon from '@mui/icons-material/Google';
 import { Backdrop, CircularProgress, FormControl, InputLabel, OutlinedInput, InputAdornment, Box, Typography, Button, Divider, Chip } from "@mui/material";
 import { useRouter } from 'next/router';
-
+import Header from '../components/Header';
 import { useAuthState } from "react-firebase-hooks/auth";
 import Link from 'next/link'
 import MaterialLink from '@mui/material/Link';
-
-
-
-
+import { useSnackbar } from "notistack";
 
 function Login() {
+  const { enqueueSnackbar } = useSnackbar();
+
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -31,7 +31,26 @@ function Login() {
       return
     }
     else if (user?.uid && !loading) {
-      router.push('./');
+      user.getIdToken(true).then(function (idToken) {
+        try {
+          fetch("http://localhost:5000/api/login", {
+            method: "POST",
+            headers: {
+              token: idToken,
+            }
+          }).then(function (response) {
+            if (response.status === 200) {
+              router.push('./');
+            }
+            else {
+              enqueueSnackbar("Login failed", { variant: "error" });
+            }
+          });
+        }
+        catch {
+
+        }
+      });
     }
     else {
       handleOpen(false);
@@ -46,15 +65,8 @@ function Login() {
       >
         <CircularProgress color="inherit" />
       </Backdrop>
-      <Link href="./" color="netural" underline="hover">
-        <Typography
-          variant="h6"
-          display="flex"
-          component="div"
-        >
-          Eshop
-        </Typography>
-      </Link>
+      <Header searchBar={false} />
+
       {!loadingNotOpen && <Container maxWidth="sm">
         <Box
           sx={{
@@ -113,7 +125,7 @@ function Login() {
             Sign Up
           </Button>
           <Typography variant="caption" sx={{ my: 2 }}>
-            Don&apos;t have an account? 
+            Don&apos;t have an account?
             <Link href="/register" passHref>
               <MaterialLink color="primary" underline="hover">
                 <Typography variant='caption' > Register here.</Typography>

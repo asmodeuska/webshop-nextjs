@@ -4,6 +4,7 @@ import { SnackbarProvider } from 'notistack';
 import { SnackbarUtilsConfigurator } from "../utils/SnackbarUtils";
 import React from 'react';
 import PropTypes from 'prop-types';
+import { grey } from '@mui/material/colors';
 
 const theme = createTheme({
   body: {
@@ -30,6 +31,9 @@ const theme = createTheme({
     },
     white: {
       main: '#ffffff',
+    },
+    grey : {
+      main: grey[700]
     }
   },
   link: {

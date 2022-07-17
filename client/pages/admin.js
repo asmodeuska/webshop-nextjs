@@ -6,12 +6,26 @@ import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import Visibility from '@mui/icons-material/Visibility';
 import GoogleIcon from '@mui/icons-material/Google';
 import { useSnackbar } from "notistack";
-import { Backdrop, CircularProgress, FormControl, InputLabel, OutlinedInput, InputAdornment, Box, Typography, Button, Divider, Chip } from "@mui/material";
+import { Backdrop, CircularProgress, Tab, Tabs, FormControl, InputLabel, OutlinedInput, InputAdornment, Box, Typography, Button, Divider, Chip } from "@mui/material";
+import TabContext from '@mui/lab/TabContext';
+import TabList from '@mui/lab/TabList';
+import TabPanel from '@mui/lab/TabPanel';
 
 import { useAuthState } from "react-firebase-hooks/auth";
 import Link from 'next/link'
 import MaterialLink from '@mui/material/Link';
 import { useRouter } from 'next/router'
+import Header from '../components/Header';
+import ManageItem from '../components/ManageItem';
+import ManageCategory from '../components/ManageCategory';
+import ManageAttribute from '../components/ManageAttribute';
+
+function a11yProps(index) {
+    return {
+        id: `full-width-tab-${index}`,
+        'aria-controls': `full-width-tabpanel-${index}`,
+    };
+}
 
 
 
@@ -22,135 +36,86 @@ function Admin() {
     const { enqueueSnackbar } = useSnackbar();
     const [user, loading] = useAuthState(auth);
     const [redirect, setRedirect] = useState(false);
-    const [loadingNotOpen, handleOpen] = useState(false);
+    const [loadingNotOpen, handleOpen] = useState(true);
     const [showPage, setShowPage] = useState(false);
     const router = useRouter()
+    const [value, setValue] = useState("1");
+
+    const handleChange = (event, newValue) => {
+        setValue(newValue);
+    };
+
+
 
     useEffect(() => {
-        if (loading) {
-            handleOpen(true);
-            return
-        }
-        else if (user?.uid && !loading) {
+        if (user?.uid && !loading) {
             handleOpen(false);
             user.getIdToken(true).then(function (idToken) {
-                fetch("http://localhost:5000/api/authentication", {
-                    method: "POST",
-                    headers: {
-                        token: idToken,
-                    }
-                }).then(data => {
-                    auth.currentUser.getIdTokenResult().then((idTokenResult) => {
-                        if (idTokenResult.claims.admin) {
-                            setShowPage(true);
+                try {
+                    fetch("http://localhost:5000/api/authenticate", {
+                        method: "POST",
+                        headers: {
+                            token: idToken,
+                        }
+                    }).then(data => {
+                        if (data.status === 200) {
+                            auth.currentUser.getIdTokenResult().then((idTokenResult) => {
+                                if (idTokenResult.claims.admin) {
+                                    setShowPage(true);
+                                }
+                            })
+                        }
+                        else {
+                            enqueueSnackbar("You are not authorized to access this page", { variant: "error" });
+                            router.push("/");
                         }
                     })
-                })
+                }
+                catch (error) {
+                    console.log(error)
+                }
+
             }).catch(function (error) {
                 console.log(error)
             });
 
         }
-        else {
+        if (!loading && !user) {
             setRedirect(true);
-            /*fetch("/api/checkUser")
-                .then((res) => res.json())
-                .then((data) => setData(data.message));*/
         }
     }, [user, loading]);
 
-    return (
-        <div>
-            {redirect && router.push('./')}
-            <Backdrop
-                sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
-                open={loadingNotOpen}
-            >
-                <CircularProgress color="inherit" />
-            </Backdrop>
-
-            <Link href="/" passHref>
-                <MaterialLink color="netural" underline="hover">
-                    <Typography
-                        variant="h6"
-                        display="flex"
-                        component="div"
-                    >
-                        Eshop
-                    </Typography>
-                </MaterialLink>
-            </Link>
-            {!loadingNotOpen && showPage && <Container maxWidth="sm">
-                <Box
-                    sx={{
-                        alignItems: "center",
-                        display: 'flex',
-                        flexDirection: 'column',
-                        justifyContent: "center",
-                        width: 500,
-                        mt: 2,
-                        backgroundColor: "grey.100",
-                    }}>
-                    <Typography sx={{ my: 3 }} variant="h2">Admin test</Typography>
-                    <Button startIcon={<GoogleIcon color='white' />} sx={{ mt: 5, my: 2 }} variant="contained" color="google" size="large" onClick={loginInWithGoogle}  >Sign in with Google</Button>
-                    <Divider flexItem variant="middle" sx={{ m: 0, my: 2 }} >
-                        <Chip label="OR" />
-                    </Divider>
-                    <FormControl sx={{ m: 1, mb: 2, width: '25ch' }} variant="outlined">
-                        <InputLabel color="secondary" htmlFor="outlined-email-input">Email</InputLabel>
-                        <OutlinedInput
-                            id="outlined-email-input"
-                            type='text'
-                            color="secondary"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            placeholder="Email"
-                            label="Email"
-                        />
-                    </FormControl>
-                    <FormControl sx={{ m: 1, width: '25ch' }} variant="outlined">
-                        <InputLabel color="secondary" htmlFor="outlined-adornment-password">Password</InputLabel>
-                        <OutlinedInput
-                            id="outlined-adornment-password"
-                            type={showPassword ? 'text' : 'password'}
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            placeholder="Password"
-                            color="secondary"
-                            endAdornment={
-                                <InputAdornment position="end">
-                                    <IconButton
-                                        aria-label="toggle password visibility"
-                                        onClick={() => setShowPassword(!showPassword)}
-                                        edge="end"
-                                    >
-                                        {showPassword ? <VisibilityOff /> : <Visibility />}
-                                    </IconButton>
-                                </InputAdornment>
-                            }
-                            label="Password"
-                        />
-                    </FormControl>
-                    <Button
-                        variant="contained"
-                        color="secondary"
-                        onClick={() => logInWithEmailAndPassword(email, password)}
-                    >
-                        Sign Up
-                    </Button>
-                    <Typography variant="caption" sx={{ my: 2 }}>
-                        Don&apos;t have an account?
-                        <Link href="/register" passHref>
-                            <MaterialLink color="netural" underline="hover">
-                                <Typography variant='h6' >Register here.</Typography>
-                            </MaterialLink>
-                        </Link>
-                    </Typography>
-                </Box >
-            </Container>
-            }
-
-        </div>
-    );
+    if (user?.uid && !loading && showPage) {
+        return (
+            <div>
+                <Header searchBar={false} />
+                <Box display="flex" justifyContent="center" flexWrap="wrap" flexDirection="column" alignItems="center">
+                    <TabContext value={value}>
+                        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                            <TabList onChange={handleChange} aria-label="lab API tabs example">
+                                <Tab label="Manage Items" value="1" />
+                                <Tab label="Manage Cattegories" value="2" />
+                                <Tab label="Manage Attributes" value="3" />
+                            </TabList>
+                        </Box>
+                        <TabPanel sx={{width: "80%"}} value="1"><ManageItem /></TabPanel>
+                        <TabPanel sx={{width: "80%"}} value="2"><ManageCategory /></TabPanel>
+                        <TabPanel sx={{width: "80%"}} value="3"><ManageAttribute /></TabPanel>
+                    </TabContext>
+                </Box>
+            </div>
+        );
+    }
+    else if (loading) {
+        return <Backdrop
+            sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+            open={loadingNotOpen}
+        >
+            <CircularProgress color="inherit" />
+        </Backdrop>
+    }
+    else if (redirect) {
+        router.push('/')
+    }
 }
 export default Admin;

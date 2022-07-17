@@ -10,7 +10,7 @@ import { Backdrop, CircularProgress, FormControl, InputLabel, OutlinedInput, Inp
 import { useRouter } from 'next/router';
 import Link from 'next/link'
 import MaterialLink from '@mui/material/Link';
-
+import Header from '../components/Header';
 
 function Register() {
   const [email, setEmail] = useState("");
@@ -42,7 +42,6 @@ function Register() {
   const handleSubmit = (event) => {
     event.preventDefault();
     if (password === password2) {
-      console.log(34);
       registerWithEmailAndPassword(email, password, name)
     }
     else {
@@ -64,15 +63,7 @@ function Register() {
       >
         <CircularProgress color="inherit" />
       </Backdrop>
-      <Link href="../">
-        <Typography
-          variant="h6"
-          display="flex"
-          component="div"
-        >
-          Eshop
-        </Typography>
-      </Link>
+      <Header searchBar={false} />
       {!loadingNotOpen && <Container maxWidth="sm">
         <Box
           sx={{
