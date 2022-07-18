@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image'
 import { useSnackbar } from "notistack";
-import { Backdrop, MenuItem, Skeleton, FormControl, InputLabel, OutlinedInput, TextField, Box, Typography, Button, Select, Grid, Card, CardActionArea, CardMedia, CardContent } from "@mui/material";
+import { MenuItem, Skeleton, FormControl, InputLabel, OutlinedInput, Box, Typography, Button, Select, Grid, Card, CardMedia, CardContent } from "@mui/material";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "./Firebase";
 
@@ -225,7 +225,7 @@ export default function ManageItem(props) {
                                     {attributes.length > 0 ?
                                         <Box display="flex" justifyContent="left" alignContent="normal" flexDirection="column">
                                             {attributes.map((attribute) => (
-                                                <Box mb={2}>
+                                                <Box key={"mainDiv_"+attribute.name} mb={2}>
                                                     <FormControl required key={attribute.name}>
                                                         <InputLabel htmlFor={attribute.name}>{attribute.name}</InputLabel>
                                                         <OutlinedInput
@@ -298,7 +298,7 @@ export default function ManageItem(props) {
                                     <Box mt={1} display="flex">
                                         <Grid container spacing={1} alignContent="space-between">
                                             {attributes.map((attribute) => (
-                                                <div className='grid_div mt-half ml-1'>
+                                                <div key={"div_"+attribute.name} className='grid_div mt-half ml-1'>
                                                     <Grid item xs={6}>
                                                         <Typography variant="body2" key={attribute.name}>
                                                             {attribute.name}:

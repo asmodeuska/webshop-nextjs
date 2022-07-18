@@ -5,7 +5,7 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
     Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
   min-width: 900px;
-
+  min-height: 100%;
 }
 
 a {
@@ -71,24 +71,24 @@ a {
   color: "red";
 }
 
-.grid_div{
+.grid_div {
   width: 100%;
   display: flex;
   flex-wrap: wrap;
 }
 
-.mt-half{
+.mt-half {
   margin-top: 0.5rem
 }
 
-.ml-1{
+.ml-1 {
   margin-left: 1rem
 }
 
-.mb-1{
+.mb-1 {
   margin-bottom: 1rem
 }
 
-.grid_border{
+.grid_border {
   border-bottom: 1px solid rgba(128, 128, 128, 0.37);
 }

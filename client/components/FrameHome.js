@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from "react";
 import Item from './Item';
 import { Box, Grid, Select, MenuItem, FormControl, InputLabel, Typography, Slider, Divider } from '@mui/material';
-import { ITEM_STICKERS } from './ENUMS.js';
 import { ItemSkeleton } from './SkeletonTemplate.js';
 
 
-
-export default function Frame() {
+export default function Frame(props) {
 
     const [products, fetchProducts] = useState([])
     const [shownProducts, setShownProducts] = useState([])
@@ -84,39 +82,31 @@ export default function Frame() {
     }, [brand])
 
     useEffect(() => {
-        try {
-            fetch("http://localhost:5000/api/getItems")
-                .then(res => res.json())
-                .then(data => {
-                    fetchProducts(data)
-                    let min = 999999;
-                    let max = 0;
-                    data.map(product => {
-                        if (product.price > max) {
-                            max = product.price
-                        }
-                        if (product.price < min) {
-                            min = product.price
-                        }
-                    })
-                    setMaxPrice(max)
-                    setMinPrice(min)
-                    setSliderValue([min, max])
-                    setShownProducts(data)
-                    let temp = [];
-                    data.map(product => {
-                        if (!temp.includes(product.brand)) {
-                            temp.push(product.brand)
-                        }
-                    })
-                    setBrands([...new Set(temp)])
-
-                })
+        if (props.data) {
+            fetchProducts(props.data)
+            let min = 999999;
+            let max = 0;
+            props.data.map(product => {
+                if (product.price > max) {
+                    max = product.price
+                }
+                if (product.price < min) {
+                    min = product.price
+                }
+            })
+            setMaxPrice(max)
+            setMinPrice(min)
+            setSliderValue([min, max])
+            setShownProducts(props.data)
+            let temp = [];
+            props.data.map(product => {
+                if (!temp.includes(product.brand)) {
+                    temp.push(product.brand)
+                }
+            })
+            setBrands([...new Set(temp)])
         }
-        catch (err) {
-            console.log(err)
-        }
-    }, [])
+    }, [props.data])
 
     return (
         <div>
@@ -193,7 +183,7 @@ export default function Frame() {
                             <Box mx={1} sx={{ bgcolor: 'grey.100', borderWidth: "2px", color: "secondary.main", borderRadius: "15px" }}>
                                 <Box p={2} textAlign="start">
                                     <Typography color="secondary" textAlign="left" variant="h4">
-                                        <b>Recommended </b>
+                                        <b>{props.title}</b>
                                     </Typography>
                                     <Typography variant="h6" color="primary">
                                         <b>{shownProducts.length} {shownProducts.length === 1 ? "item" : "items"}</b>
@@ -205,7 +195,7 @@ export default function Frame() {
                                             shownProducts.map(product => {
                                                 return (
                                                     <Grid sx={{ p: 0 }} key={product._id} item xl={3} >
-                                                        <Item category={product.category} ratings={product.ratings} attributes={product.attributes} id={product._id} image={product.image.data} title={product.name} currency="Ft" price={product.price}/>
+                                                        <Item slug={product.slug} category={product.category} ratings={product.ratings} attributes={product.attributes} id={product._id} image={product.image.data} title={product.name} currency="Ft" price={product.price} />
                                                     </Grid>
                                                 )
                                             })
@@ -241,4 +231,3 @@ export default function Frame() {
 
     );
 }
-

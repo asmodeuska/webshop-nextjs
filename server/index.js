@@ -24,7 +24,8 @@ app.post('/api/login', fb.login, );
 
 app.post('/api/addItem', fb.authenticate, upload.single('image'), inventory.addItem);
 app.get('/api/getItems', inventory.getItems);
-app.get('/api/getItem/:id', inventory.getItem);
+app.get('/api/getItem/:slug', inventory.getItem);
+app.get('/api/search/:q', inventory.search);
 
 app.post('/api/addCategory', fb.authenticate, inventory.addCategory);
 app.post('/api/getCategories', fb.authenticate, inventory.getCategories);

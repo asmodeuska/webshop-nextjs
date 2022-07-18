@@ -40,7 +40,7 @@ export default function Item(props) {
         <Card key={props.id} className="card" sx={[{
 
         }, , { margin: 1, minWidth: 250, boxShadow: 10, }]}>
-            <CardActionArea sx={{ height: "inherit" }} onClick={() => { router.push(`./p/${props.id}`) }}>
+            <CardActionArea sx={{ height: "inherit" }} onClick={() => { router.push(`./p/${props.slug}`) }}>
                 {props.category && categoryTag()}
                 <CardMedia
                     style={{

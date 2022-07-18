@@ -1,5 +1,6 @@
 const { mongo_connection } = require('../middleware/mongo');
 const productSchema = require('../schemas/productSchemas');
+const slugify = require('slugify');
 fs = require('fs');
 
 const addItem = async (req, res) => {
@@ -14,8 +15,8 @@ const addItem = async (req, res) => {
         attributes: attrs,
         image: req.file.buffer,
         price: req.body.price,
+        slug: slugify(req.body.name, { lower: true }),
     };
-    console.log(req.file);
     Item.create(data, (err, data) => {
         if (err) {
             res.status(500).send();
@@ -27,6 +28,29 @@ const addItem = async (req, res) => {
         }
     });
 }
+
+const search = async (req, res) => {
+    const Item = mongo_connection.model('products', productSchema.itemSchema);
+    let query = req.params.q;
+    console.log(query);
+    Item.find( {$or: [
+        {name: { $regex: query, $options: "i"}},
+        {description: { $regex: query, $options: "i"}},
+        {category: { $regex: query, $options: "i"}},
+        {brand: { $regex: query, $options: "i"}},
+         ],}, (err, data) => {
+        console.log(err);
+        if (err) {
+            res.status(600).send();
+            return;
+        } else {
+            res.status(200).send(data);
+            return;
+        }
+    }
+    );
+}
+
 const getItems = async (req, res) => {
     const Item = mongo_connection.model('products', productSchema.itemSchema);
     Item.find({}, (err, item) => {
@@ -41,12 +65,12 @@ const getItems = async (req, res) => {
     );
 }
 const getItem = async (req, res) => {
-    if(!req.params.id){
+    if(!req.params.slug){
         res.status(400).send();
         return;
     }
     const Item = mongo_connection.model('products', productSchema.itemSchema);
-    Item.findById(req.params.id, (err, item) => {
+    Item.find({ slug : {$regex: `${req.params.slug}`}}, (err, item) => {
         if (err) {
             res.status(500);
             return;
@@ -221,5 +245,6 @@ module.exports = {
     getCategory,
     getAttributesByCategory,
     updateCategory,
-    addRating
+    addRating,
+    search
 }

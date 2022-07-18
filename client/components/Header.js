@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { TextField, Button, AppBar, Box, Toolbar, IconButton, Typography, Paper, Badge, Grid, Tooltip, FormControl, InputAdornment } from '@mui/material';
+import { TextField, Button, AppBar, Box, Toolbar, IconButton, Typography, Paper, Badge, Grid, Tooltip, FormControl, InputAdornment, Modal } from '@mui/material';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import ShoppingBasketIcon from '@mui/icons-material/ShoppingBasket';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import LogoutIcon from '@mui/icons-material/Logout';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import MaterialLink from '@mui/material/Link';
 import SearchIcon from '@mui/icons-material/Search';
+import CloseIcon from '@mui/icons-material/Close'
 import { auth } from "./Firebase"
 import { useAuthState } from "react-firebase-hooks/auth";
 import Skeleton from '@mui/material/Skeleton';
@@ -17,6 +18,9 @@ export default function Header(props) {
     const [search, setSearch] = useState("");
     const [user, loading] = useAuthState(auth);
     const [cartSize, setCartSize] = useState(0);
+    const [cart, setCart] = useState([]);
+    const [open, setOpen] = useState(false);
+    const [cartSum, setCartSum] = useState(0);
     const menuId = 'primary-search-account-menu';
     const router = useRouter();
 
@@ -28,17 +32,31 @@ export default function Header(props) {
         })
     }
 
-    
+    const style = {
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        bgcolor: 'background.paper',
+        border: '1px solid #000',
+        boxShadow: 24,
+        p: 2,
+    };
+
     useEffect(() => {
         const cartItems = JSON.parse(localStorage.getItem('cart'));
-        let temp = 0;
+        let quantity = 0;
+        let sum = 0;
         if (cartItems) {
             cartItems.map(item => {
-                temp+= item.quantity;
+                quantity += item.quantity;
+                sum += item.price * item.quantity;
             })
         }
-        setCartSize(temp);
-    }, []);
+        setCart(cartItems);
+        setCartSize(quantity);
+        setCartSum(sum);
+    }, [props.cart]);
 
 
     return (
@@ -138,9 +156,9 @@ export default function Header(props) {
                                     </Badge>
                                 </IconButton>
 
-                                <IconButton size="large" color="inherit" edge="end">
-                                    <Badge badgeContent={ props.cart || cartSize } color="error">
-                                        <ShoppingBasketIcon />
+                                <IconButton size="large" color="inherit" edge="end" onClick={() => setOpen(true)}>
+                                    <Badge badgeContent={props.cart || cartSize} color="secondary">
+                                        <ShoppingCartIcon />
                                     </Badge>
                                 </IconButton>
                                 {user ?
@@ -152,6 +170,65 @@ export default function Header(props) {
                     </Grid>
                 </Grid>
             </Toolbar>
+            <Modal
+                open={open}
+                onClose={() => setOpen(false)}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+            >
+                <Box sx={style} width={0.7}>
+                    <Box display="inline-flex" width={1} justifyContent="space-between">
+                        <Typography id="modal-modal-title" variant="h6" component="h2">
+                            Your shopping cart
+                        </Typography>
+                        <IconButton size="medium" onClick={() => setOpen(false)}>
+                            <CloseIcon />
+                        </IconButton>
+                    </Box>
+                    {cartSize > 0 ? cart.map(item => {
+                        return (
+                            <Box px={5} py={2} display="flex" justifyContent="space-between" alignItems="center" key={item.id}>
+                                <Box display="flex" alignItems="center">
+                                    <Box>
+                                        <Typography variant="h6">{item.name}</Typography>
+                                        <Typography variant="body1">{item.price}</Typography>
+                                    </Box>
+                                </Box>
+                                <Box display="flex" justifyContent="space-between" alignItems="center">
+                                    <Box mr={6}>
+                                        <Typography variant="body1">x{item.quantity}</Typography>
+                                    </Box>
+                                    <Typography variant="body1"> {(item.price * item.quantity).toLocaleString()} Ft</Typography>
+                                </Box>
+
+                            </Box>
+                        )
+                    })
+                        : null
+                    }
+                    <Box display="flex" justifyContent="space-between" alignItems="center" flexDirection="row-reverse" px={2} py={2}>
+                        <Box display="flex" alignItems="center">
+
+                            {cartSize > 0 ?
+                                <Box display="inline-flex" alignItems="center">
+                                    <Typography variant="body1">Total:&nbsp;</Typography>
+                                    <Typography color={"primary"} variant="h6"><b>{cartSum.toLocaleString()} Ft</b></Typography>
+                                </Box>
+                                :
+                                null
+                            }
+                        </Box>
+                    </Box>
+                    <Box display="flex" justifyContent="flex-end" alignItems="center">
+                        <Link href="/checkout" passHref>
+                            <MaterialLink color="primary" underline="hover">
+                                <Typography variant="body1">Checkout</Typography>
+                            </MaterialLink>
+                        </Link>
+                    </Box>
+                </Box>
+            </Modal>
+
         </AppBar >
     );
 }

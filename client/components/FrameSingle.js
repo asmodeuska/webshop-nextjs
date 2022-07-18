@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { Box, Grid, Tooltip, Rating, FormControl, InputAdornment, Typography, Button, Divider } from '@mui/material';
+import React, { useState } from "react";
+import { Box, Grid, Tooltip, Rating, FormControl, Typography, Button, Divider } from '@mui/material';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import Image from 'next/image';
 import Header from './Header';
@@ -26,7 +26,7 @@ export default function FrameSingle(props) {
             });
         }
         if (newItemInCart) {
-            cartItems == null ? cartItems = ([{ id: props._id, quantity: 1 }]) : cartItems.push({ id: props._id, quantity: 1 });
+            cartItems == null ? cartItems = ([{ id: props._id, name: props.title, price: props.price, quantity: 1 }]) : cartItems.push({ id: props._id, name: props.title, price: props.price, quantity: 1 });
         }
         let temp = 0;
         cartItems.map(item => {

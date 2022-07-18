@@ -1,19 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { logInWithEmailAndPassword, loginInWithGoogle, auth } from "../components/Firebase";
-import Container from '@mui/material/Container';
-import IconButton from '@mui/material/IconButton';
-import VisibilityOff from '@mui/icons-material/VisibilityOff';
-import Visibility from '@mui/icons-material/Visibility';
-import GoogleIcon from '@mui/icons-material/Google';
+import { auth } from "../components/Firebase";
 import { useSnackbar } from "notistack";
-import { Backdrop, CircularProgress, Tab, Tabs, FormControl, InputLabel, OutlinedInput, InputAdornment, Box, Typography, Button, Divider, Chip } from "@mui/material";
+import { Backdrop, CircularProgress, Tab, Box } from "@mui/material";
 import TabContext from '@mui/lab/TabContext';
 import TabList from '@mui/lab/TabList';
 import TabPanel from '@mui/lab/TabPanel';
 
 import { useAuthState } from "react-firebase-hooks/auth";
-import Link from 'next/link'
-import MaterialLink from '@mui/material/Link';
 import { useRouter } from 'next/router'
 import Header from '../components/Header';
 import ManageItem from '../components/ManageItem';
